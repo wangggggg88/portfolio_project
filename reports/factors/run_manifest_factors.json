@@ -1,0 +1,26 @@
+{
+  "python": "3.12.14",
+  "pandas": "3.0.1",
+  "numpy": "2.3.5",
+  "factor_files": [
+    {
+      "file": "F-F_Research_Data_5_Factors_2x3_daily_CSV.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_daily_CSV.zip",
+      "bytes": 150292,
+      "sha256": "7881223b51929ee0d6d23b8a28524aaec478a2c3d4eeca47224955cc845c5186",
+      "retrieved_utc": "2026-10-15T18:53:05+00:00"
+    },
+    {
+      "file": "F-F_Momentum_Factor_daily_CSV.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_daily_CSV.zip",
+      "bytes": 85269,
+      "sha256": "ecf82b116e6ec56d2b79a2f27bd1d1598c217b5c6c25caa55b945bdd8a2c0b78",
+      "retrieved_utc": "2026-10-15T18:53:05+00:00"
+    }
+  ],
+  "window": [
+    "2021-01-04",
+    "2025-12-31"
+  ],
+  "hac_lags": 5
+}

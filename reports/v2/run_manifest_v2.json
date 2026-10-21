@@ -1,0 +1,16 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "pandas": "3.0.1",
+  "numpy": "2.3.5",
+  "matplotlib": "3.10.8",
+  "config_sha256": "56466260cf6a79d6e47b8180813da1633a1b16854b58bbc95b82cf7b2e624584",
+  "prices_sha256": "d8acf0e20282783858ee8beb69ecad5f592f22057beba359732b76fc2497dc6b",
+  "attribution_period": "calendar month, Brinson-Fachler, Carino linking, zero-cost scenario",
+  "var_window_days": 250,
+  "ewma_lambda": 0.94,
+  "rolling_risk_window_days": 252,
+  "first_var_forecast": "2021-12-30",
+  "var_forecast_days": 1005,
+  "research_type": "Retrospective simulation"
+}

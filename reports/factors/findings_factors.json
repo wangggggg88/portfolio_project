@@ -1,0 +1,7 @@
+[
+  "Main's US market beta is 0.55 versus 0.61 for the benchmark, although both hold 60% equity: the international sleeve moves less than one-for-one with the US market (VEA 0.77, VWO 0.61). The active market beta is -0.054 (t -11.5).",
+  "The active return also loads on size (SMB +0.063, t +11.0), value (HML +0.030, t +3.6) and, negatively, on profitability (RMW -0.031, t -4.3). These factors explain 37% of daily active-return variation; the rest is likely non-US equity and currency exposure, which US factors do not span.",
+  "Average active return was -1.48% a year (arithmetic). The lower market beta cost -0.58% in a strong US market, the small-cap tilt -0.27% and profitability -0.16%, while value added +0.22%. The remaining alpha of -0.67% has t = -0.9: factor tilts account for about 55% of the shortfall, and the rest cannot be distinguished from noise.",
+  "US equity factors describe the bond ETFs poorly (R2 BND 0.09, IEF 0.06, BNDX 0.06) and the international equity ETFs only partly (VEA 0.70, VWO 0.48). Portfolio-level alphas therefore absorb unmodelled bond and foreign returns and are not interpreted; the active-return regression, where bonds largely cancel, is the informative one.",
+  "Adding RMW, CMA and momentum to the three-factor model raises the active-return R2 only from 0.35 to 0.37; size and market explain most of what the US factors can explain."
+]

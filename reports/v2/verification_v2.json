@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "absolute_tolerance": 1e-10,
+  "checks": {
+    "monthly_buy_and_hold_vs_simulation_max_abs_error": 1.2420620087993939e-15,
+    "linked_effects_vs_active_return_max_abs_error": 1.7208456881689926e-15,
+    "active_return_vs_v1_cumulative_excess_max_abs_error": 4.884981308350689e-15,
+    "carino_loop_vs_vectorised_abs_error": 3.3306690738754696e-16,
+    "risk_contributions_sum_vs_volatility_abs_error": 4.163336342344337e-17,
+    "active_contributions_sum_vs_tracking_error_abs_error": 3.469446951953614e-17,
+    "historical_var_stdlib_vs_numpy_abs_error": 1.3877787807814457e-17,
+    "exception_count_recount_difference": 0
+  }
+}

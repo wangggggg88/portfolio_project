@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14",
+  "pandas": "3.0.1",
+  "numpy": "2.3.5",
+  "start_index": 250,
+  "refit_every": 21,
+  "ewma_lambda": 0.94,
+  "horizons": [
+    1,
+    21
+  ]
+}

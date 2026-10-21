@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checks": {
+    "ols_vs_lstsq_max_abs": 9.853229343548264e-16,
+    "decomposition_sum_abs_error": 3.469446951953614e-18
+  },
+  "sessions_used": 1255,
+  "portfolio_sessions_without_factor_data": []
+}

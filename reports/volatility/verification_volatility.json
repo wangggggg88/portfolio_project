@@ -1,0 +1,7 @@
+{
+  "status": "passed",
+  "min_loglik_increase": 0.0007076062388478022,
+  "series": 10,
+  "first_forecast": "2021-12-30",
+  "forecast_days": 1005
+}

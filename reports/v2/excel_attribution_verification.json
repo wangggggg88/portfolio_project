@@ -1,0 +1,244 @@
+[
+  {
+    "workbook": "attribution_check_Main.xlsx",
+    "portfolio": "Main",
+    "engine": "LibreOffice Calc (headless recalculation)",
+    "desktop_excel_executed": false,
+    "rows": [
+      [
+        "Months",
+        60,
+        null,
+        null,
+        null
+      ],
+      [
+        "Cumulative portfolio return",
+        0.348104244409419,
+        null,
+        null,
+        null
+      ],
+      [
+        "Cumulative benchmark return",
+        0.446820156424197,
+        null,
+        null,
+        null
+      ],
+      [
+        "Active return",
+        -0.0987159120147776,
+        null,
+        null,
+        null
+      ],
+      [
+        "K (Carino total factor)",
+        0.715880643114874,
+        null,
+        null,
+        null
+      ],
+      [
+        "Linked effect",
+        "Excel formula",
+        "Python (reports/v2)",
+        "Abs difference",
+        "Result"
+      ],
+      [
+        "Allocation, equity",
+        0,
+        0,
+        0,
+        "PASS"
+      ],
+      [
+        "Allocation, fixed income",
+        0,
+        0,
+        0,
+        "PASS"
+      ],
+      [
+        "Selection, equity",
+        -0.0948656929318596,
+        -0.0948656929319,
+        4.04398736719713e-14,
+        "PASS"
+      ],
+      [
+        "Selection, fixed income",
+        -0.00385021908291769,
+        -0.00385021908292,
+        2.30631486131117e-15,
+        "PASS"
+      ],
+      [
+        "Interaction, equity",
+        0,
+        0,
+        0,
+        "PASS"
+      ],
+      [
+        "Interaction, fixed income",
+        0,
+        0,
+        0,
+        "PASS"
+      ],
+      [
+        "Sum of linked effects",
+        -0.0987159120147773,
+        -0.09871591201482,
+        0,
+        "PASS"
+      ],
+      [
+        "Max monthly |effects - active|",
+        4.33680868994202e-18,
+        null,
+        null,
+        "PASS"
+      ],
+      [
+        "Overall",
+        "ALL PASS",
+        null,
+        null,
+        null
+      ],
+      [
+        "Blue numbers on Prices/Weights are inputs; everything else is a formula. Retrospective simulation, not investment advice.",
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "overall": "ALL PASS"
+  },
+  {
+    "workbook": "attribution_check_Conservative.xlsx",
+    "portfolio": "Conservative",
+    "engine": "LibreOffice Calc (headless recalculation)",
+    "desktop_excel_executed": false,
+    "rows": [
+      [
+        "Months",
+        60,
+        null,
+        null,
+        null
+      ],
+      [
+        "Cumulative portfolio return",
+        0.210629637948793,
+        null,
+        null,
+        null
+      ],
+      [
+        "Cumulative benchmark return",
+        0.446820156424197,
+        null,
+        null,
+        null
+      ],
+      [
+        "Active return",
+        -0.236190518475404,
+        null,
+        null,
+        null
+      ],
+      [
+        "K (Carino total factor)",
+        0.754592384439567,
+        null,
+        null,
+        null
+      ],
+      [
+        "Linked effect",
+        "Excel formula",
+        "Python (reports/v2)",
+        "Abs difference",
+        "Result"
+      ],
+      [
+        "Allocation, equity",
+        -0.0677433686094194,
+        -0.0677433686094,
+        1.94427807187481e-14,
+        "PASS"
+      ],
+      [
+        "Allocation, fixed income",
+        -0.101615052914129,
+        -0.101615052914,
+        1.29174448915137e-13,
+        "PASS"
+      ],
+      [
+        "Selection, equity",
+        -0.0946573360831235,
+        -0.0946573360831,
+        2.34534613952064e-14,
+        "PASS"
+      ],
+      [
+        "Selection, fixed income",
+        -0.00248480415318288,
+        -0.00248480415318,
+        2.87877360838351e-15,
+        "PASS"
+      ],
+      [
+        "Interaction, equity",
+        0.0315524453610411,
+        0.031552445361,
+        4.1140701956266e-14,
+        "PASS"
+      ],
+      [
+        "Interaction, fixed income",
+        -0.00124240207659144,
+        -0.00124240207659,
+        1.43895312332276e-15,
+        "PASS"
+      ],
+      [
+        "Sum of linked effects",
+        -0.236190518475405,
+        -0.23619051847527,
+        1.16573417585641e-15,
+        "PASS"
+      ],
+      [
+        "Max monthly |effects - active|",
+        2.38524477946811e-18,
+        null,
+        null,
+        "PASS"
+      ],
+      [
+        "Overall",
+        "ALL PASS",
+        null,
+        null,
+        null
+      ],
+      [
+        "Blue numbers on Prices/Weights are inputs; everything else is a formula. Retrospective simulation, not investment advice.",
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "overall": "ALL PASS"
+  }
+]

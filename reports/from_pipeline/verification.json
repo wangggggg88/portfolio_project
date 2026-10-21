@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "absolute_tolerance": 1e-10,
+  "checks": {
+    "sql_price_returns_max_abs_error": 0.0,
+    "independent_units_nav_max_abs_error": 5.995204332975845e-15,
+    "stdlib_volatility_abs_error": 0.0,
+    "daily_contribution_max_abs_error": 6.938893903907228e-18,
+    "nav_return_max_abs_error": 1.1102230246251565e-16,
+    "independent_units_all_cost_scenarios_nav_max_abs_error": 5.995204332975845e-15
+  },
+  "independent_model": "Adjusted-price virtual units; not actual tradable shares",
+  "sql_rows_checked": 9640,
+  "cost_scenarios_checked": 12
+}

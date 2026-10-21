@@ -1,0 +1,14 @@
+{
+  "python": "3.12.14",
+  "config_sha256": "56466260cf6a79d6e47b8180813da1633a1b16854b58bbc95b82cf7b2e624584",
+  "prices_sha256": "d8acf0e20282783858ee8beb69ecad5f592f22057beba359732b76fc2497dc6b",
+  "calendar_sha256": "80667beb2d5e8ae66908c3e6e4f065ac58444b632eae88a39f83521911a5f983",
+  "observations": 1255,
+  "anchor": "2020-12-31",
+  "start": "2021-01-01",
+  "end": "2025-12-31",
+  "random_seed": "No randomized computation",
+  "quality_errors": 0,
+  "quality_warnings": 0,
+  "research_type": "Retrospective simulation"
+}

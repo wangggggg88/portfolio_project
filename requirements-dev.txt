@@ -1,0 +1,2 @@
+# Only for scripts/build_attribution_excel.py (optional); --verify also needs LibreOffice
+openpyxl==3.1.5

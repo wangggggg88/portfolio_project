@@ -1,0 +1,9 @@
+[
+  "Main trailed the 60/40 benchmark by 9.87 pp cumulatively (2021-2025). Brinson-Fachler attribution assigns 0.00 pp to allocation and -9.87 pp to selection: both portfolios start every month at 60% equity / 40% fixed income, so the gap comes from what is held inside each sleeve, not from the stock-bond mix.",
+  "The equity sleeve explains -9.49 pp of the gap. Relative to holding VTI, the US small-cap (-3.41 pp), developed international (-3.53 pp) and emerging-market (-2.55 pp) positions all detracted; the fixed-income sleeve contributed -0.39 pp.",
+  "The diversified mix helped in 2022 and 2025 and hurt in 2021, 2023, 2024; the result is period-dependent and does not by itself show that the diversification choice was wrong.",
+  "For the Conservative portfolio (40/60), allocation explains -16.94 pp of its -23.62 pp gap, showing the attribution separates a lower equity weight from security choice.",
+  "Equity holdings generate 91% of Main's ex-post volatility despite a 60% weight. The 30% VTI underweight accounts for 86% of the 2.27% tracking error.",
+  "Fixed income's share of rolling 1-year risk peaked at 20% in Jun 2024, when the VTI-BND correlation was +0.39; bonds diversified less when stock-bond correlation turned positive.",
+  "1-day 95% VaR is statistically acceptable for all three methods (Kupiec p >= 0.05: yes). At 99%, all methods saw more exceptions than the 10 expected over 1005 days (historical 20, normal 23, EWMA 17); EWMA was closest (Kupiec p = 0.045), consistent with fat tails and volatility clustering."
+]

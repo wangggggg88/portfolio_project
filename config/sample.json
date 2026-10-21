@@ -1,0 +1,96 @@
+{
+  "title": "Diversified ETF Portfolio Analytics",
+  "start": "2021-01-01",
+  "end": "2021-02-26",
+  "anchor": "2020-12-31",
+  "prices": "data/sample/prices.csv",
+  "calendar": "data/sample/calendar.csv",
+  "output": "reports/sample",
+  "annual_days": 252,
+  "risk_free_annual": 0.0,
+  "cost_bps": [
+    0,
+    5,
+    10
+  ],
+  "tolerance": 1e-10,
+  "securities": {
+    "VTI": {
+      "name": "Vanguard Total Stock Market",
+      "asset_class": "US equity",
+      "currency": "USD"
+    },
+    "VB": {
+      "name": "Vanguard Small-Cap",
+      "asset_class": "US equity",
+      "currency": "USD"
+    },
+    "VEA": {
+      "name": "Vanguard FTSE Developed Markets",
+      "asset_class": "International equity",
+      "currency": "USD"
+    },
+    "VWO": {
+      "name": "Vanguard FTSE Emerging Markets",
+      "asset_class": "International equity",
+      "currency": "USD"
+    },
+    "BND": {
+      "name": "Vanguard Total Bond Market",
+      "asset_class": "US bond",
+      "currency": "USD"
+    },
+    "IEF": {
+      "name": "iShares 7-10 Year Treasury Bond",
+      "asset_class": "US bond",
+      "currency": "USD"
+    },
+    "TIP": {
+      "name": "iShares TIPS Bond",
+      "asset_class": "US bond",
+      "currency": "USD"
+    },
+    "BNDX": {
+      "name": "Vanguard Total International Bond",
+      "asset_class": "International bond",
+      "currency": "USD"
+    }
+  },
+  "portfolios": {
+    "Main": {
+      "VTI": 0.3,
+      "VB": 0.1,
+      "VEA": 0.15,
+      "VWO": 0.05,
+      "BND": 0.2,
+      "IEF": 0.1,
+      "TIP": 0.05,
+      "BNDX": 0.05
+    },
+    "Benchmark": {
+      "VTI": 0.6,
+      "BND": 0.4
+    },
+    "Equal": {
+      "VTI": 0.125,
+      "VB": 0.125,
+      "VEA": 0.125,
+      "VWO": 0.125,
+      "BND": 0.125,
+      "IEF": 0.125,
+      "TIP": 0.125,
+      "BNDX": 0.125
+    },
+    "Conservative": {
+      "VTI": 0.2,
+      "VB": 0.05,
+      "VEA": 0.1,
+      "VWO": 0.05,
+      "BND": 0.3,
+      "IEF": 0.15,
+      "TIP": 0.1,
+      "BNDX": 0.05
+    }
+  },
+  "sample": true
+}

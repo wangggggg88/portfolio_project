@@ -1,0 +1,9 @@
+ticker,segment,weight,selection_incl_interaction
+VTI,Equity,0.3,6.27218707726e-18
+VB,Equity,0.1,-0.0340598490284
+VEA,Equity,0.15,-0.0353328572245
+VWO,Equity,0.05,-0.025472986679
+BND,Fixed income,0.2,-1.78900784582e-18
+IEF,Fixed income,0.1,-0.00927843073805
+TIP,Fixed income,0.05,0.00460277124699
+BNDX,Fixed income,0.05,0.000825440408147

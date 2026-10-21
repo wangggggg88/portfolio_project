@@ -1,0 +1,16 @@
+.venv/
+.venv_repro/
+.tmp/
+.mplconfig/
+__pycache__/
+node_modules/
+# Vendor market data is not licensed here for public redistribution.
+data/snapshot/
+data/sample/
+wheelhouse/
+tmp/
+# Factor data: Kenneth R. French Data Library files, not redistributed here
+data/factors/raw/
+# Workbooks embed month-end vendor prices; rebuild locally with scripts/build_attribution_excel.py
+outputs/portfolio/*.xlsx
+outputs/portfolio/*.ndjson
