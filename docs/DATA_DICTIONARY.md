@@ -1,65 +1,65 @@
-# 数据与计算口径
+# Data and Calculation Definitions
 
-本项目为个人回顾性模拟研究。没有客户持仓、真实交易或实习内部数据。
+This is a personal retrospective simulation study. It uses no client holdings, real trades or internal company data.
 
-## 数据来源与证券
+## Data sources and securities
 
-数据：Yahoo Finance chart HTTPS接口；调整价格定义见 https://in.help.yahoo.com/kb/adjusted-close-sln28256.html 。供应商说明调整收盘价包含分红和拆股调整，本项目将其作为总回报代理，不把调整价当作实际成交价。
+Data: the Yahoo Finance chart HTTPS endpoint. Adjusted close is defined at https://in.help.yahoo.com/kb/adjusted-close-sln28256.html. The vendor states that adjusted closes include dividend and split adjustments; this project uses them as a total-return proxy and never treats them as traded prices.
 
-使用范围：本地个人学习与研究。Yahoo数据不是本项目开放许可的一部分；本项目不主张市场数据再分发许可。相关条款 https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html 。原始数据和本地市场样例已加入.gitignore，未上传或发布。代码与市场数据应分别管理。
+Use: personal study and research. Yahoo data are not part of this project's open license, and no right to redistribute market data is claimed. Terms: https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html. Raw data and local market samples are listed in `.gitignore` and are not published. Code and market data are kept separate.
 
-ETF定义参考发行人目录 https://advisors.vanguard.com/investments/etfs 及 https://workplace.vanguard.com/fund-list/ ，IEF https://www.ishares.com/us/products/239456/ishares-710-year-treasury-bond-etf ，TIP https://www.ishares.com/us/products/239467/ishares-tips-bond-etf 。
+ETF definitions follow the issuer pages: https://advisors.vanguard.com/investments/etfs and https://workplace.vanguard.com/fund-list/; IEF https://www.ishares.com/us/products/239456/ishares-710-year-treasury-bond-etf; TIP https://www.ishares.com/us/products/239467/ishares-tips-bond-etf.
 
-|代码|暴露|解释|
+| Ticker | Exposure | Notes |
 |---|---|---|
-|VTI|美国全市场股票|主组合核心股票，也用于基准|
-|VB|美国小盘股票|与VTI有重叠，表示小盘倾斜，不是独立无重叠资产|
-|VEA|国际发达市场股票|美元挂牌，不等于消除底层汇率风险|
-|VWO|新兴市场股票|美元挂牌，仍有底层汇率风险|
-|BND|美国广泛投资级债券|主组合核心债券，也用于基准|
-|IEF|美国7-10年国债|与BND有部分暴露重叠|
-|TIP|美国通胀保值债券|仍受价格、期限和利率变化影响|
-|BNDX|国际债券|与其他债券ETF的配置差异需结合产品定义理解|
+| VTI | US total stock market | Core equity holding; also used in the benchmark |
+| VB | US small-cap equity | Overlaps with VTI; represents a small-cap tilt, not a separate non-overlapping asset |
+| VEA | International developed equity | USD-listed, but the underlying currency risk remains |
+| VWO | Emerging markets equity | USD-listed, but the underlying currency risk remains |
+| BND | US investment-grade aggregate bonds | Core bond holding; also used in the benchmark |
+| IEF | US Treasuries, 7–10 years | Partly overlaps with BND |
+| TIP | US inflation-protected Treasuries | Still exposed to price, duration and interest-rate changes |
+| BNDX | International bonds | Differences from the other bond ETFs depend on the product definitions |
 
-## 输入文件
+## Input files
 
-`prices.csv`：每个date/ticker一条记录，所有价格以USD计价。
+`prices.csv`: one row per date and ticker; all prices in USD.
 
-|字段|类型|规则|
+| Field | Type | Rule |
 |---|---|---|
-|date|YYYY-MM-DD|交易日期；按日递增；必须覆盖冻结参考日历|
-|ticker|字符串|必须属于配置中的8只ETF|
-|adj_close|浮点|必须为正、有限；收益计算唯一使用的价格|
-|close|浮点|供应商普通close原样保留，不用来计算模拟成交金额；可能含拆股调整|
-|price_type|字符串|必须为adjusted_close|
-|source|字符串|Yahoo Finance，不能为空|
+| date | YYYY-MM-DD | Trading date; ascending; must cover the frozen reference calendar |
+| ticker | string | Must be one of the eight ETFs in the configuration |
+| adj_close | float | Positive and finite; the only price used to compute returns |
+| close | float | Vendor's unadjusted close, kept as delivered; not used for simulated trade amounts; may include split adjustments |
+| price_type | string | Must be `adjusted_close` |
+| source | string | `Yahoo Finance`; must not be empty |
 
-`calendar.csv`：冻结VTI观测到的日期。用它核查其他7只ETF的缺失，不使用所有ETF的交集，以免静默删除缺失日期。周末不在此参考日历中。局限：这不是独立交易所日历，无法独立检测8只ETF同时缺失的日期；未将其包装为完整项目二质量监控。
+`calendar.csv`: the frozen set of dates observed for VTI. It is used to detect missing dates in the other seven ETFs, rather than intersecting all ETFs, so that missing dates are never dropped silently. Weekends are not in the calendar. Limitation: this is not an independent exchange calendar, so a date missing for all eight ETFs at once cannot be detected.
 
-`manifest.json`：下载UTC时间、请求URL、原始JSON及规范化CSV的SHA-256、原始行数、时区。原始响应写入新快照目录后不覆盖。数据若要更新，须使用新目录、重新配置日期并验证，分析入口不会联网更新。
+`manifest.json`: download time (UTC), request URLs, SHA-256 checksums of the raw JSON and normalized CSV files, raw row counts and time zones. Raw responses are written to a new snapshot directory and never overwritten. A data update requires a new directory, new configuration dates and a fresh validation; the analysis itself never goes online.
 
-## 组合方法
+## Portfolio method
 
-2020-12-31收盘为净值1的价格锚点。2021首个交易日开始产生收益，2025-12-31为末日。全样本1255个收益观测。初始配置、基准及替代权重在首次取数前写入配置；研究为回顾性模拟，权重并非在2020年真实提出或交易。
+The 2020-12-31 close is the price anchor, with NAV = 1. Returns start on the first trading day of 2021 and end on 2025-12-31, giving 1,255 return observations. The main, benchmark and alternative weights were written into the configuration before any data were downloaded. The study is a retrospective simulation: the weights were not actually proposed or traded in 2020.
 
-主组合60%股票/40%债券：美国股票40%、国际股票20%；债券覆盖美国广泛债券、国债、TIPS和国际债券。此配置用于比较暴露差异，没有按样本内收益优化。基准60% VTI/40% BND是易解释的美国股债对照，不代表全球市场唯一正确基准。
+Main portfolio, 60% equity / 40% bonds: 40% US equity and 20% international equity; the bond sleeve covers US aggregate bonds, Treasuries, TIPS and international bonds. The weights are meant to compare exposures and were not optimized on in-sample returns. The 60% VTI / 40% BND benchmark is an easy-to-read US stock-bond reference, not the only correct benchmark for global markets.
 
-日资产收益 r(i,t)=P(i,t)/P(i,t-1)-1。日组合毛收益=sum(w(i,t-1)*r(i,t))。非再平衡日权重按资产回报漂移。月末收盘形成目标权重，下一交易日的close-to-close收益使用新权重；权重生成不依赖未来价格。
+Daily asset return r(i,t) = P(i,t)/P(i,t-1) - 1. Daily gross portfolio return = sum(w(i,t-1) * r(i,t)). Between rebalances, weights drift with asset returns. Target weights are set at the month-end close and apply from the next session's close-to-close return; weights never depend on future prices.
 
-费用=费率*sum(abs(目标权重-交易前漂移权重))。该比例是买入金额加卖出金额除以交易前净值，不除以2。初始建仓比例=1；净收益=(1-费用)*(1+毛收益)-1。费用按比例减小资产规模；不模拟现金账户、实际成交数量、税费或滑点。末日无后续观察，不重平衡、不清仓收费。
+Cost = rate * sum(abs(target weight - pre-trade drifted weight)). This is buys plus sells divided by pre-trade NAV, not divided by two. The initial purchase counts as 1. Net return = (1 - cost) * (1 + gross return) - 1. Costs shrink all holdings in proportion; cash, share quantities, taxes and slippage are not modeled. There is no rebalance and no liquidation cost on the final day, because no later return follows it.
 
-年化收益=(末日净值/初始净值)^(252/收益观测数)-1；样本标准差ddof=1。年化波动率=日收益标准差*sqrt(252)。Sharpe=日超额收益平均值*252/(超额收益标准差*sqrt(252))，无风险利率=0简化假设。非零无风险年率按(1+rf)^(1/252)-1转换。
+Annual return = (final NAV / initial NAV)^(252 / number of returns) - 1. Standard deviations use ddof = 1. Annual volatility = standard deviation of daily returns * sqrt(252). Sharpe = mean daily excess return * 252 / (standard deviation of excess returns * sqrt(252)), with a zero risk-free rate as a simplifying assumption. A non-zero annual rate would be converted as (1 + rf)^(1/252) - 1.
 
-Tracking error=std(组合日净收益-同成本基准日净收益)*sqrt(252)。Information ratio=主动日收益平均值*252/tracking error。分母接近0时返回不可计算，CSV显示n.a.，没有返回0。
+Tracking error = std(daily net portfolio return - daily net benchmark return at the same cost) * sqrt(252). Information ratio = mean daily active return * 252 / tracking error. When a denominator is close to zero the result is undefined and shown as n.a. in the CSV files, never as 0.
 
-最大回撤=min(净值/此前最高净值-1)，此前最高净值包括初始1，故首日下跌也被计入。月度、年度收益按相应日收益的(1+r)连乘减1，不累加。样例的年度行只是部分年度，不能当成全年结果。
+Maximum drawdown = min(NAV / prior peak NAV - 1), where the prior peak includes the initial NAV of 1, so a loss on the first day counts. Monthly and annual returns compound daily returns as the product of (1 + r) minus 1; they are never summed. In the short sample the annual rows cover partial years and are not full-year results.
 
-累计超额收益同时提供两种定义：`cumulative_excess_pp`是两个累计收益的差（百分比点），`relative_wealth_return`是末日净值之比减1。二者不混用。
+Two definitions of cumulative excess return are reported: `cumulative_excess_pp` is the difference between the two cumulative returns (percentage points), and `relative_wealth_return` is the ratio of final NAVs minus 1. They are not mixed.
 
-日贡献=sum(w前一期*r资产)=组合毛收益。多期贡献用前一日组合净值链接：sum(NAV(t-1)*日贡献)，只用于零成本模型，各资产累计财富贡献加总等于总收益。`active_wealth_reconciliation.csv`为两个组合链接贡献之差，加总等于累计收益差额；它不是Brinson归因，没有分离配置效应、选择效应，也不证明因果。
+Daily contribution = sum(previous weight * asset return) = gross portfolio return. Multi-period contributions are linked with previous-day NAV: sum(NAV(t-1) * daily contribution), for the zero-cost model only, so the cumulative wealth contributions of all assets add up to the total return. `active_wealth_reconciliation.csv` is the difference between the two portfolios' linked contributions and adds up to the cumulative return gap. It is not Brinson attribution: it does not separate allocation and selection effects and does not prove cause.
 
-## 输入门禁
+## Input checks
 
-重复、缺失、未知证券、非法日期、非正或空价格、错误价格类型、源缺失：阻断分析并输出定位信息，不补零。超15%绝对日价格变化：警告并保留。全样本没有触发警告。此次研究不实施项目二的交易质量规则、数据库更新、隔离区或运行调度。
+Duplicates, missing values, unknown securities, invalid dates, non-positive or empty prices, a wrong price type and a missing source all stop the analysis with the location of the problem; nothing is filled with zero. A daily price change above 15% in absolute value raises a warning and is kept. No warnings were raised on the full sample.
 
-所有关键浮点一致性检查使用绝对误差容差1e-10。计算不使用随机数，不需要随机种子。
+All key floating-point consistency checks use an absolute tolerance of 1e-10. No random numbers are used, so no random seed is needed.

@@ -5,6 +5,7 @@ reports/v2 (version-1 outputs are not touched).
 
     python -m src.run_v2 --config config/full.json
 """
+
 import argparse
 import hashlib
 import json
@@ -27,8 +28,10 @@ COMPARED = ["Main", "Equal", "Conservative"]
 
 
 def broad_segments(cfg):
-    return {t: ("Equity" if "equity" in v["asset_class"].lower() else "Fixed income")
-            for t, v in cfg["securities"].items()}
+    return {
+        t: ("Equity" if "equity" in v["asset_class"].lower() else "Fixed income")
+        for t, v in cfg["securities"].items()
+    }
 
 
 def independent_checks(prices, cfg, attributions, results, decomp, forecasts, tests):
@@ -42,7 +45,10 @@ def independent_checks(prices, cfg, attributions, results, decomp, forecasts, te
     worst = 0.0
     for name in COMPARED + ["Benchmark"]:
         w = cfg["portfolios"][name]
-        hand = [sum(w.get(t, 0) * (p[i][j] / p[i - 1][j] - 1) for j, t in enumerate(tick)) for i in range(1, len(p))]
+        hand = [
+            sum(w.get(t, 0) * (p[i][j] / p[i - 1][j] - 1) for j, t in enumerate(tick))
+            for i in range(1, len(p))
+        ]
         sim = monthly_returns(results[name]["daily"]).tolist()
         worst = max(worst, max(abs(a - b) for a, b in zip(hand, sim)))
     checks["monthly_buy_and_hold_vs_simulation_max_abs_error"] = worst
@@ -51,7 +57,9 @@ def independent_checks(prices, cfg, attributions, results, decomp, forecasts, te
     for name, a in attributions.items():
         active = a["total_portfolio"] - a["total_benchmark"]
         worst_sum = max(worst_sum, abs(a["by_effect"].sum() - active))
-        m = metrics(results[name]["daily"], results["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"])
+        m = metrics(
+            results[name]["daily"], results["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"]
+        )
         worst_v1 = max(worst_v1, abs(active - m["cumulative_excess_pp"]))
         sel_int = a["by_effect"]["selection"] + a["by_effect"]["interaction"]
         worst_sum = max(worst_sum, abs(a["assets"].selection_incl_interaction.sum() - sel_int))
@@ -64,13 +72,17 @@ def independent_checks(prices, cfg, attributions, results, decomp, forecasts, te
     tb = math.prod(1 + x for x in rb) - 1
     K = (math.log(1 + tp) - math.log(1 + tb)) / (tp - tb)
     eff = a["monthly_effects"].sum(axis=1).tolist()
-    linked = sum(e * ((math.log(1 + x) - math.log(1 + y)) / (x - y) if x != y else 1 / (1 + x)) / K
-                 for e, x, y in zip(eff, rp, rb))
+    linked = sum(
+        e * ((math.log(1 + x) - math.log(1 + y)) / (x - y) if x != y else 1 / (1 + x)) / K
+        for e, x, y in zip(eff, rp, rb)
+    )
     checks["carino_loop_vs_vectorised_abs_error"] = abs(linked - a["by_effect"].sum())
     # 4. Euler risk contributions sum to volatility / tracking error.
     sigma, te, table = decomp
     checks["risk_contributions_sum_vs_volatility_abs_error"] = abs(table.risk_contribution.sum() - sigma)
-    checks["active_contributions_sum_vs_tracking_error_abs_error"] = abs(table.active_risk_contribution.sum() - te)
+    checks["active_contributions_sum_vs_tracking_error_abs_error"] = abs(
+        table.active_risk_contribution.sum() - te
+    )
     # 5. Historical VaR re-derived with stdlib sorting for first and last forecast of Main.
     R = prices.pct_change(fill_method=None).iloc[1:]
     ws = results["Main"]["weights_start"]
@@ -79,7 +91,9 @@ def independent_checks(prices, cfg, attributions, results, decomp, forecasts, te
     for t_date in [f.index[0], f.index[-1]]:
         t = R.index.get_loc(t_date)
         w = ws.iloc[t].tolist()
-        pnl = sorted(sum(a_ * b_ for a_, b_ in zip(row, w)) for row in R.iloc[t - 250:t].to_numpy().tolist())
+        pnl = sorted(
+            sum(a_ * b_ for a_, b_ in zip(row, w)) for row in R.iloc[t - 250 : t].to_numpy().tolist()
+        )
         pos = 0.01 * (len(pnl) - 1)
         lo = int(math.floor(pos))
         q = pnl[lo] + (pnl[lo + 1] - pnl[lo]) * (pos - lo)  # linear interpolation, numpy default
@@ -98,7 +112,9 @@ def independent_checks(prices, cfg, attributions, results, decomp, forecasts, te
 def run(config):
     path = ROOT / config
     cfg = json.loads(path.read_text(encoding="utf-8"))
-    out = ROOT / cfg["output"].replace("reports/full", "reports/v2").replace("reports/sample", "reports/v2_sample")
+    out = ROOT / cfg["output"].replace("reports/full", "reports/v2").replace(
+        "reports/sample", "reports/v2_sample"
+    )
     out.mkdir(parents=True, exist_ok=True)
     frame = pd.read_csv(ROOT / cfg["prices"])
     calendar = pd.read_csv(ROOT / cfg["calendar"]).date
@@ -115,7 +131,9 @@ def run(config):
     for name in COMPARED:
         a = attribute(prices, cfg["portfolios"][name], bench, segments)
         attributions[name] = a
-        a["by_segment"].rename_axis("segment").to_csv(out / f"attribution_{name}_by_segment.csv", float_format="%.12g")
+        a["by_segment"].rename_axis("segment").to_csv(
+            out / f"attribution_{name}_by_segment.csv", float_format="%.12g"
+        )
         a["assets"].rename_axis("ticker").to_csv(out / f"attribution_{name}_assets.csv", float_format="%.12g")
         a["annual"].rename_axis("year").to_csv(out / f"attribution_{name}_annual.csv", float_format="%.12g")
         monthly = a["monthly_effects"].copy()
@@ -123,9 +141,15 @@ def run(config):
         monthly.insert(0, "benchmark_return", a["monthly_benchmark"])
         monthly.insert(0, "portfolio_return", a["monthly_portfolio"])
         monthly.rename_axis("month").to_csv(out / f"attribution_{name}_monthly.csv", float_format="%.12g")
-        summary.append({"portfolio": name, "portfolio_return": a["total_portfolio"],
-                        "benchmark_return": a["total_benchmark"],
-                        "active_return": a["total_portfolio"] - a["total_benchmark"], **a["by_effect"].to_dict()})
+        summary.append(
+            {
+                "portfolio": name,
+                "portfolio_return": a["total_portfolio"],
+                "benchmark_return": a["total_benchmark"],
+                "active_return": a["total_portfolio"] - a["total_benchmark"],
+                **a["by_effect"].to_dict(),
+            }
+        )
     pd.DataFrame(summary).to_csv(out / "attribution_summary.csv", index=False, float_format="%.12g")
 
     # ---- risk ----
@@ -147,23 +171,41 @@ def run(config):
     tests.to_csv(out / "var_backtest.csv", index=False, float_format="%.12g")
 
     # ---- verification & provenance ----
-    ver = independent_checks(prices, cfg, attributions, results, decomp, forecasts,
-                             tests[tests.portfolio.eq("Main")])
+    ver = independent_checks(
+        prices, cfg, attributions, results, decomp, forecasts, tests[tests.portfolio.eq("Main")]
+    )
     (out / "verification_v2.json").write_text(json.dumps(ver, indent=2), encoding="utf-8")
     import matplotlib
-    manifest = {"python": platform.python_version(), "platform": platform.platform(),
-                "pandas": pd.__version__, "numpy": np.__version__, "matplotlib": matplotlib.__version__,
-                "config_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                "prices_sha256": hashlib.sha256((ROOT / cfg["prices"]).read_bytes()).hexdigest(),
-                "attribution_period": "calendar month, Brinson-Fachler, Carino linking, zero-cost scenario",
-                "var_window_days": 250, "ewma_lambda": 0.94, "rolling_risk_window_days": 252,
-                "first_var_forecast": str(forecasts["Main"].index[0].date()),
-                "var_forecast_days": len(forecasts["Main"]),
-                "research_type": "Retrospective simulation"}
+
+    manifest = {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "pandas": pd.__version__,
+        "numpy": np.__version__,
+        "matplotlib": matplotlib.__version__,
+        "config_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "prices_sha256": hashlib.sha256((ROOT / cfg["prices"]).read_bytes()).hexdigest(),
+        "attribution_period": "calendar month, Brinson-Fachler, Carino linking, zero-cost scenario",
+        "var_window_days": 250,
+        "ewma_lambda": 0.94,
+        "rolling_risk_window_days": 252,
+        "first_var_forecast": str(forecasts["Main"].index[0].date()),
+        "var_forecast_days": len(forecasts["Main"]),
+        "research_type": "Retrospective simulation",
+    }
     (out / "run_manifest_v2.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    facts = {"sigma": sigma, "te": te, "table": table, "seg_share": seg_share, "rolling": rolling,
-             "tests": tests, "forecasts": forecasts, "attributions": attributions, "manifest": manifest}
+    facts = {
+        "sigma": sigma,
+        "te": te,
+        "table": table,
+        "seg_share": seg_share,
+        "rolling": rolling,
+        "tests": tests,
+        "forecasts": forecasts,
+        "attributions": attributions,
+        "manifest": manifest,
+    }
     notes = report_v2.findings(facts)
     (out / "findings_v2.json").write_text(json.dumps(notes, indent=2), encoding="utf-8")
     report_v2.charts(out, facts)

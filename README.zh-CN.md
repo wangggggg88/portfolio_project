@@ -43,7 +43,7 @@
 - **VaR**：99% VaR 只有在「反应快的模型 + FHS」时才能通过 Kupiec 检验（4 个全部通过，例如 EWMA 例外 12 次，期望 10 次）。用正态分位数时 4 个中 2 个失败；慢速窗口无论哪种方法都失败。
 - **波动率目标**（10%、不加杠杆、每月调整、5 bps，参数事先固定）：2022–2025 年最大回撤从 −21.4% 降到 −17.2%，波动率从 11.2% 降到 9.5%，年化收益几乎不变（5.10% 对 5.16%）。Sharpe 的差异不显著。
 
-完整报告（英文）：[归因与风险](reports/v2/attribution_risk_report.pdf) · [因子](reports/factors/factor_report.pdf) · [波动率](reports/volatility/volatility_report.pdf)
+完整报告（英文）：[业绩](reports/full/portfolio_report.pdf) · [归因与风险](reports/v2/attribution_risk_report.pdf) · [因子](reports/factors/factor_report.pdf) · [波动率](reports/volatility/volatility_report.pdf)
 
 ## 结果如何核对
 
@@ -59,7 +59,6 @@
   - Excel 公式复现归因结果（在 LibreOffice 中重算，没有在桌面版 Excel 中运行）；
   - 自写优化器与 scipy 结果一致。
 - **可复现**：Windows 和 Linux 运行结果完全一致，依赖版本固定。
-- **数据对接**：改用配套项目 *Financial Data Pipeline and Quality Monitoring* 清洗后的价格重跑，117 个指标与快照的最大差异为 3.1e-8。
 
 ## 局限
 
@@ -90,7 +89,7 @@ python -m venv .venv
 config/     组合权重、日期范围、成本
 src/        portfolio.py · attribution.py · risk.py · factors.py · volatility.py · vol_target.py · run_*.py
 tests/      38 项单元测试
-scripts/    数据下载、Excel 核对、与数据管道的对接检查、总结图
+scripts/    因子数据下载、Excel 归因核对、可复现性检查、总结图
 reports/    各模块的 CSV、图表和 PDF 报告
 docs/       数据字典、一页摘要、总结图
 ```

@@ -43,7 +43,7 @@ A diversified eight-ETF 60/40 portfolio returned **34.81%** over 2021–2025. A 
 - **VaR**: 99% VaR passes the Kupiec test only when a responsive model is combined with filtered historical simulation (4 of 4 pass, e.g. EWMA 12 exceptions vs 10 expected). With a normal quantile, 2 of 4 fail; slow windows fail either way.
 - **Volatility target** (10%, no leverage, monthly, 5 bps; settings fixed in advance): over 2022–2025, max drawdown falls from −21.4% to −17.2% and volatility from 11.2% to 9.5%. Annualized return is almost unchanged (5.10% vs 5.16%). The Sharpe difference is not significant.
 
-Full reports: [attribution and risk](reports/v2/attribution_risk_report.pdf) · [factors](reports/factors/factor_report.pdf) · [volatility](reports/volatility/volatility_report.pdf)
+Full reports: [performance](reports/full/portfolio_report.pdf) · [attribution and risk](reports/v2/attribution_risk_report.pdf) · [factors](reports/factors/factor_report.pdf) · [volatility](reports/volatility/volatility_report.pdf)
 
 ## How the results are checked
 
@@ -59,7 +59,6 @@ Full reports: [attribution and risk](reports/v2/attribution_risk_report.pdf) · 
   - Excel formulas reproduce the attribution (recalculated in LibreOffice, not desktop Excel);
   - the hand-written optimizer matches scipy.
 - **Reproducibility**: Windows and Linux runs give identical results, with pinned dependencies.
-- **Data contract**: rerun on prices from the companion project, *Financial Data Pipeline and Quality Monitoring*, all 117 metrics match the snapshot within 3.1e-8.
 
 ## Limitations
 
@@ -90,7 +89,7 @@ python -m venv .venv
 config/     portfolio weights, date range, costs
 src/        portfolio.py · attribution.py · risk.py · factors.py · volatility.py · vol_target.py · run_*.py
 tests/      38 unit tests
-scripts/    data fetch, Excel check builders, pipeline contract check, summary figure
+scripts/    factor download, Excel attribution check, reproducibility check, summary figure
 reports/    CSV, charts and PDF reports for each module
 docs/       data dictionary, one-page summary, summary figure
 ```

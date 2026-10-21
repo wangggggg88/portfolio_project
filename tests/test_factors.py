@@ -33,10 +33,17 @@ class FactorTests(unittest.TestCase):
     def synthetic(self, n=1500, seed=3):
         rng = np.random.default_rng(seed)
         idx = pd.bdate_range("2021-01-01", periods=n).strftime("%Y-%m-%d")
-        F = pd.DataFrame(rng.normal(0, 0.01, (n, 6)), index=idx, columns=["Mkt-RF", "SMB", "HML", "RMW", "CMA", "Mom"])
+        F = pd.DataFrame(
+            rng.normal(0, 0.01, (n, 6)), index=idx, columns=["Mkt-RF", "SMB", "HML", "RMW", "CMA", "Mom"]
+        )
         F["RF"] = 0.0001
         betas = np.array([0.9, 0.3, -0.2, 0.1, 0.05, -0.1])
-        r = 0.0002 + F[["Mkt-RF", "SMB", "HML", "RMW", "CMA", "Mom"]].to_numpy() @ betas + F.RF + rng.normal(0, 0.002, n)
+        r = (
+            0.0002
+            + F[["Mkt-RF", "SMB", "HML", "RMW", "CMA", "Mom"]].to_numpy() @ betas
+            + F.RF
+            + rng.normal(0, 0.002, n)
+        )
         return pd.Series(r, index=idx), F, betas
 
     def test_recovers_known_betas_and_matches_lstsq(self):
@@ -55,7 +62,7 @@ class FactorTests(unittest.TestCase):
         Xc = np.column_stack([np.ones(len(r)), X])
         e = res["resid"]
         inv = np.linalg.inv(Xc.T @ Xc)
-        white = inv @ (Xc.T * e ** 2) @ Xc @ inv * len(r) / (len(r) - 2)
+        white = inv @ (Xc.T * e**2) @ Xc @ inv * len(r) / (len(r) - 2)
         np.testing.assert_allclose(res["se"], np.sqrt(np.diag(white)), rtol=1e-10)
 
     def test_decomposition_sums_exactly(self):
@@ -68,7 +75,8 @@ class FactorTests(unittest.TestCase):
         t = regress_table({"x": r}, F)
         self.assertEqual(set(t.model), {"FF3", "FF5", "FF5+MOM"})
         b1 = rolling_beta(r, F)
-        r2 = r.copy(); r2.iloc[-1] = 0.5
+        r2 = r.copy()
+        r2.iloc[-1] = 0.5
         b2 = rolling_beta(r2, F)
         pd.testing.assert_series_equal(b1.iloc[:-1], b2.iloc[:-1])
 

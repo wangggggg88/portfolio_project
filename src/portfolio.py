@@ -1,6 +1,8 @@
 """Daily return / drifting-weight model; no share or execution-price ledger."""
+
 import numpy as np
 import pandas as pd
+
 
 def simulate(prices, target, cost_bps=0):
     weights = np.array([target.get(t, 0.0) for t in prices.columns], dtype=float)
@@ -35,14 +37,21 @@ def simulate(prices, target, cost_bps=0):
             pending_turnover = float(np.abs(weights - w).sum())
             trades.append([date, returns.index[i + 1], pending_turnover])
             w = weights.copy()
-    daily = pd.DataFrame(rows, index=returns.index, columns=["gross_return", "net_return", "nav", "cost_fraction", "traded_fraction"])
+    daily = pd.DataFrame(
+        rows,
+        index=returns.index,
+        columns=["gross_return", "net_return", "nav", "cost_fraction", "traded_fraction"],
+    )
     # Include initial NAV in running peak so first-session loss is a drawdown.
     daily["drawdown"] = daily.nav / np.maximum(1.0, daily.nav.cummax()) - 1
-    return {"daily": daily,
-            "weights_start": pd.DataFrame(starts, index=returns.index, columns=prices.columns),
-            "weights_end": pd.DataFrame(ends, index=returns.index, columns=prices.columns),
-            "contributions": pd.DataFrame(contributions, index=returns.index, columns=prices.columns),
-            "rebalances": pd.DataFrame(trades, columns=["formation_date", "effective_date", "traded_fraction"])}
+    return {
+        "daily": daily,
+        "weights_start": pd.DataFrame(starts, index=returns.index, columns=prices.columns),
+        "weights_end": pd.DataFrame(ends, index=returns.index, columns=prices.columns),
+        "contributions": pd.DataFrame(contributions, index=returns.index, columns=prices.columns),
+        "rebalances": pd.DataFrame(trades, columns=["formation_date", "effective_date", "traded_fraction"]),
+    }
+
 
 def metrics(daily, benchmark, annual_days=252, rf_annual=0.0):
     r = daily.net_return
@@ -55,17 +64,24 @@ def metrics(daily, benchmark, annual_days=252, rf_annual=0.0):
     ratio = lambda a, b: float(a / b) if np.isfinite(b) and abs(b) > 1e-14 else np.nan
     total = float(daily.nav.iloc[-1] - 1)
     bench_total = float(benchmark.nav.iloc[-1] - 1)
-    return {"observations": len(r), "total_return": total,
-            "annual_return": float((1 + total) ** (annual_days / len(r)) - 1),
-            "annual_volatility": vol, "max_drawdown": float(daily.drawdown.min()),
-            "sharpe": ratio(excess.mean() * annual_days, exvol),
-            "tracking_error": te, "information_ratio": ratio(active.mean() * annual_days, te),
-            "cumulative_excess_pp": total - bench_total,
-            "relative_wealth_return": float((1 + total) / (1 + bench_total) - 1),
-            "traded_fraction_sum": float(daily.traded_fraction.sum())}
+    return {
+        "observations": len(r),
+        "total_return": total,
+        "annual_return": float((1 + total) ** (annual_days / len(r)) - 1),
+        "annual_volatility": vol,
+        "max_drawdown": float(daily.drawdown.min()),
+        "sharpe": ratio(excess.mean() * annual_days, exvol),
+        "tracking_error": te,
+        "information_ratio": ratio(active.mean() * annual_days, te),
+        "cumulative_excess_pp": total - bench_total,
+        "relative_wealth_return": float((1 + total) / (1 + bench_total) - 1),
+        "traded_fraction_sum": float(daily.traded_fraction.sum()),
+    }
+
 
 def monthly_returns(daily):
     return (1 + daily.net_return).groupby(daily.index.to_period("M")).prod() - 1
+
 
 def linked_contributions(result):
     """Exact gross wealth contribution: sum(NAV_before_day * daily contribution).

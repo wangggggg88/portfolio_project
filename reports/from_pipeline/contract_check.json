@@ -1,9 +1,0 @@
-{
-  "status": "passed",
-  "window_end": "2025-10-20",
-  "sessions": 1205,
-  "metrics_compared": 117,
-  "max_abs_difference": 3.118725955264523e-08,
-  "tolerance": 1e-06,
-  "note": "Export prices are stored to 6 decimals in the pipeline's landing files; differences come from that rounding."
-}

@@ -1,10 +1,12 @@
 """One 2x2 summary figure for the README, drawn only from files already in reports/.
 
-    python scripts/build_summary_figure.py      ->  docs/summary.png
+python scripts/build_summary_figure.py      ->  docs/summary.png
 """
+
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -14,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 R = ROOT / "reports"
 OUT = ROOT / "docs" / "summary.png"
 
-BLUE, ORANGE = "#2a78d6", "#eb6834"          # Main / managed  vs  benchmark / original
+BLUE, ORANGE = "#2a78d6", "#eb6834"  # Main / managed  vs  benchmark / original
 INK, MUTED, GRID = "#1f1f1e", "#6b6a64", "#e4e3de"
 
 
@@ -32,11 +34,19 @@ def hbars(ax, labels, values, unit):
     ax.barh(list(y), values, color=BLUE, height=0.6)
     ax.axvline(0, color=MUTED, lw=0.8)
     ax.set_yticks(list(y), labels)
-    ax.xaxis.grid(True, color=GRID, lw=0.6); ax.set_axisbelow(True)
+    ax.xaxis.grid(True, color=GRID, lw=0.6)
+    ax.set_axisbelow(True)
     span = max(abs(v) for v in values)
     for yi, v in zip(y, values):
-        ax.text(v + (0.03 if v >= 0 else -0.03) * span, yi, f"{v:+.2f}{unit}", va="center",
-                ha="left" if v >= 0 else "right", fontsize=8, color=INK)
+        ax.text(
+            v + (0.03 if v >= 0 else -0.03) * span,
+            yi,
+            f"{v:+.2f}{unit}",
+            va="center",
+            ha="left" if v >= 0 else "right",
+            fontsize=8,
+            color=INK,
+        )
     lo, hi = min(0, min(values)), max(0, max(values))
     ax.set_xlim(lo - 0.3 * span, hi + 0.3 * span)
 
@@ -61,30 +71,42 @@ def main():
     a = a[a["selection_incl_interaction"].abs() > 1e-9]
     hbars(axes[0, 1], a["ticker"], (a["selection_incl_interaction"] * 100).tolist(), " pp")
     style(axes[0, 1], "2  Attribution: the gap is selection, not allocation")
-    axes[0, 1].set_xlabel("Contribution to cumulative active return, pp (allocation effect = 0)",
-                          color=MUTED, fontsize=8)
+    axes[0, 1].set_xlabel(
+        "Contribution to cumulative active return, pp (allocation effect = 0)", color=MUTED, fontsize=8
+    )
 
     # 3. Factor decomposition of annual active return
     f = pd.read_csv(R / "factors" / "active_return_decomposition.csv")
     f = f[~f["component"].str.startswith("total")]
-    names = {"alpha": "Alpha (n.s.)", "Mkt-RF": "Market", "SMB": "Size", "HML": "Value",
-             "RMW": "Profitability", "CMA": "Investment", "Mom": "Momentum"}
+    names = {
+        "alpha": "Alpha (n.s.)",
+        "Mkt-RF": "Market",
+        "SMB": "Size",
+        "HML": "Value",
+        "RMW": "Profitability",
+        "CMA": "Investment",
+        "Mom": "Momentum",
+    }
     hbars(axes[1, 0], [names[c] for c in f["component"]], (f["annualised_contribution"] * 100).tolist(), "%")
     style(axes[1, 0], "3  Factors: tilts explain ~55% of -1.48%/yr")
-    axes[1, 0].set_xlabel("Annualized contribution to active return, % (Fama-French 5 + momentum)",
-                          color=MUTED, fontsize=8)
+    axes[1, 0].set_xlabel(
+        "Annualized contribution to active return, % (Fama-French 5 + momentum)", color=MUTED, fontsize=8
+    )
 
     # 4. Volatility target drawdown
     ax = axes[1, 1]
     v = pd.read_csv(R / "volatility" / "vol_target_daily_returns.csv", parse_dates=["date"]).set_index("date")
-    for col, color, label in (("Original (fully invested)", ORANGE, "Original"),
-                              ("Vol target 10%, EWMA 0.94", BLUE, "10% vol target (EWMA)")):
+    for col, color, label in (
+        ("Original (fully invested)", ORANGE, "Original"),
+        ("Vol target 10%, EWMA 0.94", BLUE, "10% vol target (EWMA)"),
+    ):
         nav = (1 + v[col]).cumprod()
         dd = nav / nav.cummax().clip(lower=1) - 1
         ax.plot(dd.index, dd * 100, color=color, lw=1.5, label=f"{label}: max {dd.min():.1%}")
     ax.yaxis.grid(True, color=GRID, lw=0.6)
     ax.legend(frameon=False, fontsize=8, loc="lower right")
-    ax.xaxis.set_major_locator(mdates.YearLocator()); ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     ax.set_ylabel("Drawdown, %", color=MUTED, fontsize=8)
     style(ax, "4  Volatility target: shallower drawdowns (2022-25)")
 

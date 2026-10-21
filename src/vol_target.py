@@ -11,6 +11,7 @@ start from Main's zero-cost daily returns, so the comparison isolates the overla
 The 10% target, the 100% cap and the 5 bps cost were fixed before results were seen; other targets
 are reported as sensitivity, not chosen after the fact.
 """
+
 import math
 
 import numpy as np
@@ -46,23 +47,28 @@ def stats(r, rf, annual=252):
     dd = nav / np.maximum(1, nav.cummax()) - 1
     monthly_vol = r.groupby(pd.Index(r.index).str[:7]).std(ddof=1) * math.sqrt(annual)
     q = r.quantile(0.05)
-    return {"cumulative": total, "annual_return": (1 + total) ** (1 / years) - 1,
-            "annual_vol": float(r.std(ddof=1) * math.sqrt(annual)),
-            "sharpe": float(ex.mean() / ex.std(ddof=1) * math.sqrt(annual)),
-            "max_drawdown": float(dd.min()),
-            "worst_month": float(((1 + r).groupby(pd.Index(r.index).str[:7]).prod() - 1).min()),
-            "es_95_daily": float(-r[r <= q].mean()),
-            "monthly_vol_dispersion": float(monthly_vol.std(ddof=1)),
-            "highest_monthly_vol": float(monthly_vol.max())}
+    return {
+        "cumulative": total,
+        "annual_return": (1 + total) ** (1 / years) - 1,
+        "annual_vol": float(r.std(ddof=1) * math.sqrt(annual)),
+        "sharpe": float(ex.mean() / ex.std(ddof=1) * math.sqrt(annual)),
+        "max_drawdown": float(dd.min()),
+        "worst_month": float(((1 + r).groupby(pd.Index(r.index).str[:7]).prod() - 1).min()),
+        "es_95_daily": float(-r[r <= q].mean()),
+        "monthly_vol_dispersion": float(monthly_vol.std(ddof=1)),
+        "highest_monthly_vol": float(monthly_vol.max()),
+    }
 
 
 def memmel_test(a, b):
     """Jobson-Korkie test with Memmel's correction for equal Sharpe ratios of two return series.
     Returns (z, two-sided p). Positive z: a has the higher Sharpe ratio."""
-    a = np.asarray(a, float); b = np.asarray(b, float)
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
     T = len(a)
-    s1 = a.mean() / a.std(ddof=1); s2 = b.mean() / b.std(ddof=1)
+    s1 = a.mean() / a.std(ddof=1)
+    s2 = b.mean() / b.std(ddof=1)
     rho = np.corrcoef(a, b)[0, 1]
-    v = (2 - 2 * rho + 0.5 * (s1 ** 2 + s2 ** 2 - 2 * s1 * s2 * rho ** 2)) / T
+    v = (2 - 2 * rho + 0.5 * (s1**2 + s2**2 - 2 * s1 * s2 * rho**2)) / T
     z = (s1 - s2) / math.sqrt(v)
     return float(z), math.erfc(abs(z) / math.sqrt(2))

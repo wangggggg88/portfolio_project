@@ -9,6 +9,7 @@ Conventions
     1-day horizon is r_t^2 and for an h-day horizon the sum of the next h squared returns.
   * No scipy dependency: Gaussian quasi-maximum likelihood is maximised with a small Nelder-Mead.
 """
+
 import math
 from statistics import NormalDist
 
@@ -33,15 +34,18 @@ def nelder_mead(f, x0, step=0.5, tol=1e-8, max_iter=2000):
         if abs(vals[-1] - vals[0]) <= tol * (abs(vals[0]) + tol):
             break
         centroid = np.mean(pts[:-1], axis=0)
-        xr = centroid + (centroid - pts[-1]); fr = f(xr)
+        xr = centroid + (centroid - pts[-1])
+        fr = f(xr)
         if vals[0] <= fr < vals[-2]:
             pts[-1], vals[-1] = xr, fr
             continue
         if fr < vals[0]:
-            xe = centroid + 2 * (centroid - pts[-1]); fe = f(xe)
+            xe = centroid + 2 * (centroid - pts[-1])
+            fe = f(xe)
             pts[-1], vals[-1] = (xe, fe) if fe < fr else (xr, fr)
             continue
-        xc = centroid + 0.5 * (pts[-1] - centroid); fc = f(xc)
+        xc = centroid + 0.5 * (pts[-1] - centroid)
+        fc = f(xc)
         if fc < vals[-1]:
             pts[-1], vals[-1] = xc, fc
             continue
@@ -60,12 +64,12 @@ def _sig(x):
 def _params(z, gjr):
     """Unconstrained z -> (omega, alpha, gamma, beta) with omega > 0 and persistence < 1."""
     omega = math.exp(z[0])
-    persist = 0.9999 * _sig(z[1])                     # alpha + gamma/2 + beta
-    share_arch = _sig(z[2])                           # share of persistence from the ARCH terms
+    persist = 0.9999 * _sig(z[1])  # alpha + gamma/2 + beta
+    share_arch = _sig(z[2])  # share of persistence from the ARCH terms
     arch = persist * share_arch
     beta = persist - arch
     if gjr:
-        g_share = _sig(z[3])                          # part of the ARCH budget given to the asymmetry term
+        g_share = _sig(z[3])  # part of the ARCH budget given to the asymmetry term
         gamma = 2 * arch * g_share
         alpha = arch - gamma / 2
     else:
@@ -107,8 +111,15 @@ def fit_garch(r_pct, gjr=False, start=None):
             break
         z, val = z2, val2
     omega, alpha, gamma, beta = _params(z, gjr)
-    return {"omega": omega, "alpha": alpha, "gamma": gamma, "beta": beta,
-            "persistence": alpha + gamma / 2 + beta, "neg_loglik": val, "z": list(z)}
+    return {
+        "omega": omega,
+        "alpha": alpha,
+        "gamma": gamma,
+        "beta": beta,
+        "persistence": alpha + gamma / 2 + beta,
+        "neg_loglik": val,
+        "z": list(z),
+    }
 
 
 def garch_term_variance(s2_next, p, h):
@@ -118,7 +129,7 @@ def garch_term_variance(s2_next, p, h):
         return h * s2_next
     vbar = p["omega"] / (1 - pers)
     k = np.arange(h)
-    return float(np.sum(vbar + pers ** k * (s2_next - vbar)))
+    return float(np.sum(vbar + pers**k * (s2_next - vbar)))
 
 
 # ---------------------------------------------------------------- forecasts
@@ -141,9 +152,9 @@ def forecasts(r, start, horizons=(1, 21), refit=21, lam=0.94):
     WARM = 63
     warm = {m: np.full(n, np.nan) for m in models}
     for t in range(WARM, start):
-        warm["hist63"][t] = float(np.mean(x[t - 63:t] ** 2))
-        warm["hist252"][t] = float(np.mean(x[max(0, t - 252):t] ** 2))
-    ew = float(np.mean(x[:WARM] ** 2))          # EWMA seeded on the first 63 returns, then run forward
+        warm["hist63"][t] = float(np.mean(x[t - 63 : t] ** 2))
+        warm["hist252"][t] = float(np.mean(x[max(0, t - 252) : t] ** 2))
+    ew = float(np.mean(x[:WARM] ** 2))  # EWMA seeded on the first 63 returns, then run forward
     for t in range(WARM, start):
         if t > WARM:
             ew = lam * ew + (1 - lam) * x[t - 1] ** 2
@@ -167,25 +178,31 @@ def forecasts(r, start, horizons=(1, 21), refit=21, lam=0.94):
                 s2[name] = path[-1]
                 if t == start:
                     warm[name][WARM:start] = np.asarray(path[WARM:start]) / 1e4
-                history.append({"date": r.index[t], "model": name, **{k: v for k, v in p.items() if k != "z"}})
+                history.append(
+                    {"date": r.index[t], "model": name, **{k: v for k, v in p.items() if k != "z"}}
+                )
         else:
             for name in ("garch", "gjr"):
                 p = params[name]
                 prev = x[t - 1] * 100.0
-                s2[name] = p["omega"] + (p["alpha"] + (p["gamma"] if prev < 0 else 0.0)) * prev * prev + p["beta"] * s2[name]
+                s2[name] = (
+                    p["omega"]
+                    + (p["alpha"] + (p["gamma"] if prev < 0 else 0.0)) * prev * prev
+                    + p["beta"] * s2[name]
+                )
         for h in horizons:
-            out[h]["hist63"][t] = h * float(np.mean(x[t - 63:t] ** 2))
-            out[h]["hist252"][t] = h * float(np.mean(x[max(0, t - 252):t] ** 2))
+            out[h]["hist63"][t] = h * float(np.mean(x[t - 63 : t] ** 2))
+            out[h]["hist252"][t] = h * float(np.mean(x[max(0, t - 252) : t] ** 2))
             out[h]["ewma"][t] = h * ew
             for name in ("garch", "gjr"):
                 out[h][name][t] = garch_term_variance(s2[name], params[name], h) / 1e4
     # HAR on squared returns: target = sum of next h squared returns; regressors = daily, weekly, monthly means
-    sq = pd.Series(x ** 2, index=r.index)
+    sq = pd.Series(x**2, index=r.index)
     d = sq.shift(0)
     w = sq.rolling(5).mean()
     m = sq.rolling(22).mean()
     for h in horizons:
-        target = sum(sq.shift(-k) for k in range(h))          # target at row t: sum of r^2 over t..t+h-1
+        target = sum(sq.shift(-k) for k in range(h))  # target at row t: sum of r^2 over t..t+h-1
         X_all = np.column_stack([np.ones(n), d.shift(1), w.shift(1), m.shift(1)])  # info up to t-1
         har_beta = None
         for t in range(start, n):
@@ -195,7 +212,8 @@ def forecasts(r, start, horizons=(1, 21), refit=21, lam=0.94):
             if len(rows) < 100:
                 continue
             if (t - start) % refit == 0 or har_beta is None:
-                Xa = X_all[rows]; ya = target.to_numpy()[rows]
+                Xa = X_all[rows]
+                ya = target.to_numpy()[rows]
                 ok = np.isfinite(Xa).all(axis=1) & np.isfinite(ya)
                 har_beta = np.linalg.lstsq(Xa[ok], ya[ok], rcond=None)[0]
             f = float(X_all[t] @ har_beta)
@@ -264,11 +282,20 @@ def evaluate(frame, h):
     keep = np.all(np.isfinite(np.column_stack(list(ql.values()))), axis=1) & (df.realized.to_numpy() > 0)
     for m in models:
         a, b, r2 = mincer_zarnowitz(df.realized.to_numpy(), df[m].to_numpy())
-        rows.append({"model": m, "horizon": h, "observations": int(keep.sum()), "qlike": float(np.mean(ql[m][keep])),
-                     "mse_x1e8": float(np.mean(mse(df.realized, df[m]))) * 1e8, "mz_intercept_x1e4": a * 1e4,
-                     "mz_slope": b, "mz_r2": r2,
-                     "avg_forecast_vol_ann": float(np.mean(np.sqrt(df[m] / h * 252))),
-                     "avg_realized_vol_ann": float(np.sqrt(np.mean(df.realized) / h * 252))})
+        rows.append(
+            {
+                "model": m,
+                "horizon": h,
+                "observations": int(keep.sum()),
+                "qlike": float(np.mean(ql[m][keep])),
+                "mse_x1e8": float(np.mean(mse(df.realized, df[m]))) * 1e8,
+                "mz_intercept_x1e4": a * 1e4,
+                "mz_slope": b,
+                "mz_r2": r2,
+                "avg_forecast_vol_ann": float(np.mean(np.sqrt(df[m] / h * 252))),
+                "avg_realized_vol_ann": float(np.sqrt(np.mean(df.realized) / h * 252)),
+            }
+        )
         if m != "ewma":
             stat, p = diebold_mariano(ql[m][keep], ql["ewma"][keep], lags)
             dm.append({"model": m, "vs": "ewma", "horizon": h, "dm_stat_qlike": stat, "p_value": p})
@@ -294,7 +321,9 @@ def var_from_vol(frame1, r, warm=None, levels=(0.95, 0.99), fhs_window=250):
         for a in levels:
             tag = int(round(a * 100))
             rows[f"{m}_normal_{tag}"] = nd.inv_cdf(a) * sig
-            q = z.shift(1).rolling(fhs_window, min_periods=100).quantile(1 - a).reindex(frame1.index)  # past only
+            q = (
+                z.shift(1).rolling(fhs_window, min_periods=100).quantile(1 - a).reindex(frame1.index)
+            )  # past only
             rows[f"{m}_fhs_{tag}"] = -q * sig
     x = r.reindex(frame1.index)
     out = pd.DataFrame(rows, index=frame1.index)

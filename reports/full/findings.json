@@ -1,8 +1,8 @@
 [
-  "主组合累计收益34.81%，基准44.68%，差额-9.87个百分点；相对财富收益-6.82%。",
-  "主组合年化波动率10.63%，基准11.18%；最大回撤分别为-22.22%与-21.49%。是否降低风险须同时查看两项指标。",
-  "主组合最差日历年为2022，收益-15.86%，同期基准-16.70%。这说明跨资产配置仍可能在同一年受损。",
-  "VTI的累计财富贡献最大，为21.35个百分点。该数值采用逐日净值链接，各资产贡献之和等于总收益；不代表相对基准的独立归因。",
-  "10个基点成本情景下，主组合累计收益34.54%，较零成本降低0.27个百分点；这里按买入加卖出金额比例收费，包含初始建仓。",
-  "累计收益差额的财富贡献对账中，VTI的主组合贡献减基准贡献为-23.33个百分点，是最大负差额项。这是两个组合贡献的算术对账，不是Brinson归因或因果证明。"
+  "The main portfolio returned 34.81% cumulatively against 44.68% for the benchmark, a gap of -9.87 pp; the relative wealth return is -6.82%.",
+  "Annualized volatility is 10.63% for the main portfolio and 11.18% for the benchmark; maximum drawdowns are -22.22% and -21.49%. Whether risk was lower depends on looking at both measures.",
+  "The main portfolio's worst calendar year was 2022, at -15.86% against -16.70% for the benchmark. A multi-asset allocation can still lose in the same year.",
+  "VTI made the largest cumulative wealth contribution, 21.35 pp. Contributions are linked through daily NAV and sum to the total return; they are not attribution relative to the benchmark.",
+  "With 10 bps costs the main portfolio returns 34.54% cumulatively, 0.27 pp less than at zero cost. Costs are charged on buys plus sells, including the initial purchase.",
+  "In the wealth-contribution reconciliation of the return gap, VTI has the largest negative difference between its main-portfolio and benchmark contributions, -23.33 pp. This is an arithmetic reconciliation of two portfolios, not Brinson attribution or proof of cause."
 ]

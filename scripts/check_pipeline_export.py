@@ -6,6 +6,7 @@ compares every metric. Writes reports/from_pipeline/contract_check.json.
 
     python scripts/check_pipeline_export.py
 """
+
 import json
 import sys
 from pathlib import Path
@@ -40,16 +41,36 @@ def main():
         ra = {n: simulate(a, w, bps) for n, w in cfg["portfolios"].items()}
         rb = {n: simulate(b, w, bps) for n, w in cfg["portfolios"].items()}
         for n in cfg["portfolios"]:
-            ma = metrics(ra[n]["daily"], ra["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"])
-            mb = metrics(rb[n]["daily"], rb["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"])
+            ma = metrics(
+                ra[n]["daily"], ra["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"]
+            )
+            mb = metrics(
+                rb[n]["daily"], rb["Benchmark"]["daily"], cfg["annual_days"], cfg["risk_free_annual"]
+            )
             for k, v in ma.items():
                 if isinstance(v, float) and v == v:
-                    d = abs(v - mb[k]); worst = max(worst, d)
-                    rows.append({"portfolio": n, "cost_bps": bps, "metric": k, "pipeline": v, "snapshot": mb[k], "abs_diff": d})
+                    d = abs(v - mb[k])
+                    worst = max(worst, d)
+                    rows.append(
+                        {
+                            "portfolio": n,
+                            "cost_bps": bps,
+                            "metric": k,
+                            "pipeline": v,
+                            "snapshot": mb[k],
+                            "abs_diff": d,
+                        }
+                    )
     tol = 1e-6
-    result = {"status": "passed" if worst <= tol and len(a) == len(b) else "failed", "window_end": end,
-              "sessions": len(a) - 1, "metrics_compared": len(rows), "max_abs_difference": worst, "tolerance": tol,
-              "note": "Export prices are stored to 6 decimals in the pipeline's landing files; differences come from that rounding."}
+    result = {
+        "status": "passed" if worst <= tol and len(a) == len(b) else "failed",
+        "window_end": end,
+        "sessions": len(a) - 1,
+        "metrics_compared": len(rows),
+        "max_abs_difference": worst,
+        "tolerance": tol,
+        "note": "Export prices are stored to 6 decimals in the pipeline's landing files; differences come from that rounding.",
+    }
     out = ROOT / cfg["output"]
     out.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(out / "contract_check_metrics.csv", index=False, float_format="%.12g")

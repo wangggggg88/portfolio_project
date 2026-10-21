@@ -4,6 +4,7 @@ Everything here uses only information available at the forecast time:
 the forecast for session t uses asset returns up to t-1 and the drifted
 weights at the start of t (weights_start from simulate()).
 """
+
 import math
 from statistics import NormalDist
 import numpy as np
@@ -11,6 +12,7 @@ import pandas as pd
 
 
 # ---------- risk decomposition ----------
+
 
 def risk_contributions(cov, w):
     """Euler decomposition of portfolio volatility: ctr_i = w_i (Cov w)_i / sigma; sums to sigma."""
@@ -32,11 +34,18 @@ def decomposition_table(asset_returns, w_port, w_bench, annual_days=252):
     wb = np.array([w_bench.get(t, 0.0) for t in cols])
     sigma, mctr, ctr = risk_contributions(cov, wp)
     te, amctr, actr = risk_contributions(cov, wp - wb)
-    table = pd.DataFrame({"weight": wp, "active_weight": wp - wb,
-                          "marginal_contribution": mctr, "risk_contribution": ctr,
-                          "pct_of_volatility": ctr / sigma,
-                          "active_risk_contribution": actr, "pct_of_tracking_error": actr / te},
-                         index=pd.Index(cols, name="ticker"))
+    table = pd.DataFrame(
+        {
+            "weight": wp,
+            "active_weight": wp - wb,
+            "marginal_contribution": mctr,
+            "risk_contribution": ctr,
+            "pct_of_volatility": ctr / sigma,
+            "active_risk_contribution": actr,
+            "pct_of_tracking_error": actr / te,
+        },
+        index=pd.Index(cols, name="ticker"),
+    )
     return sigma, te, table
 
 
@@ -62,6 +71,7 @@ def rolling_segment_risk(asset_returns, w_port, segments, window=252, annual_day
 
 # ---------- VaR / ES forecasts ----------
 
+
 def var_forecasts(asset_returns, weights_start, realized, levels=(0.95, 0.99), window=250, lam=0.94):
     """Rolling 1-day VaR and ES forecasts, reported as positive loss fractions.
 
@@ -85,7 +95,7 @@ def var_forecasts(asset_returns, weights_start, realized, levels=(0.95, 0.99), w
         if t > window:
             r = X[t - 1][:, None]
             ewma = lam * ewma + (1 - lam) * (r @ r.T)
-        hist = X[t - window:t]
+        hist = X[t - window : t]
         w = W[t]
         pnl = hist @ w
         cov = np.cov(hist.T, ddof=1)
@@ -110,6 +120,7 @@ def var_forecasts(asset_returns, weights_start, realized, levels=(0.95, 0.99), w
 
 # ---------- backtests ----------
 
+
 def _xlogy(x, y):
     return 0.0 if x == 0 else x * math.log(y)
 
@@ -128,8 +139,10 @@ def christoffersen(hits):
     """Christoffersen (1998) independence LR (chi-square(1)) using first-order transition counts."""
     h = np.asarray(hits, dtype=int)
     prev, cur = h[:-1], h[1:]
-    n00 = int(((prev == 0) & (cur == 0)).sum()); n01 = int(((prev == 0) & (cur == 1)).sum())
-    n10 = int(((prev == 1) & (cur == 0)).sum()); n11 = int(((prev == 1) & (cur == 1)).sum())
+    n00 = int(((prev == 0) & (cur == 0)).sum())
+    n01 = int(((prev == 0) & (cur == 1)).sum())
+    n10 = int(((prev == 1) & (cur == 0)).sum())
+    n11 = int(((prev == 1) & (cur == 1)).sum())
     pi0 = n01 / (n00 + n01) if n00 + n01 else 0.0
     pi1 = n11 / (n10 + n11) if n10 + n11 else 0.0
     pi = (n01 + n11) / (n00 + n01 + n10 + n11)
@@ -155,12 +168,24 @@ def backtest(forecasts, levels=(0.95, 0.99), methods=("historical", "normal", "e
             lr_ind, p_ind, _ = christoffersen(hits)
             lr_cc = lr_pof + lr_ind
             loss_on_hit = -forecasts.realized[hits.astype(bool)]
-            rows.append({"method": m, "confidence": a, "days": n, "expected_exceptions": n * (1 - a),
-                         "exceptions": x, "exception_rate": x / n,
-                         "kupiec_lr": lr_pof, "kupiec_p": p_pof,
-                         "independence_lr": lr_ind, "independence_p": p_ind,
-                         "conditional_coverage_lr": lr_cc, "conditional_coverage_p": math.exp(-lr_cc / 2),
-                         "avg_var": float(var.mean()), "avg_es": float(es.mean()),
-                         "avg_loss_on_exception": float(loss_on_hit.mean()) if x else float("nan"),
-                         "avg_es_on_exception": float(es[hits.astype(bool)].mean()) if x else float("nan")})
+            rows.append(
+                {
+                    "method": m,
+                    "confidence": a,
+                    "days": n,
+                    "expected_exceptions": n * (1 - a),
+                    "exceptions": x,
+                    "exception_rate": x / n,
+                    "kupiec_lr": lr_pof,
+                    "kupiec_p": p_pof,
+                    "independence_lr": lr_ind,
+                    "independence_p": p_ind,
+                    "conditional_coverage_lr": lr_cc,
+                    "conditional_coverage_p": math.exp(-lr_cc / 2),
+                    "avg_var": float(var.mean()),
+                    "avg_es": float(es.mean()),
+                    "avg_loss_on_exception": float(loss_on_hit.mean()) if x else float("nan"),
+                    "avg_es_on_exception": float(es[hits.astype(bool)].mean()) if x else float("nan"),
+                }
+            )
     return pd.DataFrame(rows)

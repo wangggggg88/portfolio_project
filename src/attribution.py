@@ -9,6 +9,7 @@ exact rather than an approximation (verified in run_v2 against simulate()).
 Only the zero-cost scenario is attributed; costs would appear as an unexplained
 residual and are reported separately in cost_sensitivity.csv.
 """
+
 import math
 import numpy as np
 import pandas as pd
@@ -32,7 +33,9 @@ def segment_view(weights, asset_returns, segments):
     zero weight has an undefined return (NaN).
     """
     names = list(dict.fromkeys(segments[t] for t in asset_returns.columns))
-    w = pd.Series({s: sum(weights.get(t, 0.0) for t in asset_returns.columns if segments[t] == s) for s in names})
+    w = pd.Series(
+        {s: sum(weights.get(t, 0.0) for t in asset_returns.columns if segments[t] == s) for s in names}
+    )
     r = pd.DataFrame(index=asset_returns.index, columns=names, dtype=float)
     for s in names:
         members = [t for t in asset_returns.columns if segments[t] == s]
@@ -75,8 +78,10 @@ def brinson_fachler(wp, wb, rp, rb):
 
 def carino_factors(Rp, Rb):
     """Carino (1999) smoothing: k_t = [ln(1+Rp_t) - ln(1+Rb_t)] / (Rp_t - Rb_t), K likewise for the total."""
+
     def k(a, b):
         return 1 / (1 + a) if abs(a - b) < 1e-15 else (math.log1p(a) - math.log1p(b)) / (a - b)
+
     kt = pd.Series([k(a, b) for a, b in zip(Rp, Rb)], index=Rp.index)
     total_p = float(np.prod(1 + Rp) - 1)
     total_b = float(np.prod(1 + Rb) - 1)
@@ -112,8 +117,11 @@ def attribute(prices, port_w, bench_w, segments):
         w = port_w.get(t, 0.0)
         if w == 0:
             continue
-        asset_rows[t] = {"segment": s, "weight": w,
-                         "selection_incl_interaction": float((w * (R[t] - rb_s[s]) * kt / K).sum())}
+        asset_rows[t] = {
+            "segment": s,
+            "weight": w,
+            "selection_incl_interaction": float((w * (R[t] - rb_s[s]) * kt / K).sum()),
+        }
     assets = pd.DataFrame(asset_rows).T
     assets["weight"] = assets.weight.astype(float)
     assets["selection_incl_interaction"] = assets.selection_incl_interaction.astype(float)
@@ -123,8 +131,18 @@ def attribute(prices, port_w, bench_w, segments):
         row = l.groupby(level=0).sum().to_dict()
         row.update({"portfolio": tp, "benchmark": tb, "active": tp - tb})
         annual[year] = row
-    annual = pd.DataFrame(annual).T[["portfolio", "benchmark", "active", "allocation", "selection", "interaction"]]
-    return {"monthly_portfolio": Rp, "monthly_benchmark": Rb, "monthly_effects": eff,
-            "by_effect": by_effect, "by_segment": by_segment, "assets": assets, "annual": annual,
-            "total_portfolio": total_p, "total_benchmark": total_b,
-            "segment_weights": pd.DataFrame({"portfolio": wp_s, "benchmark": wb_s})}
+    annual = pd.DataFrame(annual).T[
+        ["portfolio", "benchmark", "active", "allocation", "selection", "interaction"]
+    ]
+    return {
+        "monthly_portfolio": Rp,
+        "monthly_benchmark": Rb,
+        "monthly_effects": eff,
+        "by_effect": by_effect,
+        "by_segment": by_segment,
+        "assets": assets,
+        "annual": annual,
+        "total_portfolio": total_p,
+        "total_benchmark": total_b,
+        "segment_weights": pd.DataFrame({"portfolio": wp_s, "benchmark": wb_s}),
+    }
